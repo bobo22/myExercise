@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>map集合</title>
+	</head>
+
+	<body>
+	</body>
+	<script>
+	
+		function Map(){
+			//此处用来存放数据
+			this.data = {};
+			
+			//set方法
+			this.set = function(key,value){
+				if(this.data[key] == null){
+					this.data[key] = value
+				}
+			}
+			
+			//get方法
+			this.get = function(key,value){
+				return this.data[key];
+			}			
+		}
+		Map.prototype.toString = function(){
+			var s = '[';
+				for(var i in this.data){
+					var content = '[' + i + ',' + this.data[i] + ']';
+					s += content;
+				}
+				s += ']';
+				return s;
+		}
+		
+		var testMap = new Map();
+		testMap.set(1,'11');
+		testMap.set(2,'22');
+		console.log(testMap.toString());
+		
+		
+		//下面实现数组去重的基本两种方法，第一种是先排序，如果已经有，则不操作
+		var myarray = [1,2,3,7,8,23,3,8,34,1];
+		arrayGet(myarray);
+		getArray(myarray);
+		popArray(myarray);
+		
+		function arrayGet(arr){
+			var newArr = [];
+			arr.sort(function(a,b){
+				return a - b;
+			});
+			newArr.push(arr[0]);
+			for(var i = 0; i < arr.length - 1;i++){
+				if(arr[i+1] != arr[i]){
+					newArr.push(arr[i+1]);
+				}
+			};
+			console.log(newArr);
+		}
+		//第二种方法,将不重复的数组存在对象中，同时存到新数组中,每次判断该json中是否有该元素
+		function getArray(arr){
+			var newObj = {};
+			var newArr = [];
+			for(var i = 0; i < arr.length;i++){
+				if(!newObj[arr[i]]){
+					newArr.push(arr[i]);
+					newObj[arr[i]] = 1;
+				}
+			};
+			console.log(newArr);
+		}
+		
+		console.log('-------------------------');
+		
+		//实现排序，1.冒泡排序
+		
+		function popArray(arr){
+			for(var i = 0;i<arr.length;i++){
+				for(var j = i + 1; j<arr.length; j++){
+					if(arr[j]<arr[i]){
+						//交换操作
+						var temp = arr[i];
+						arr[i] = arr[j];
+						arr[j] = temp;
+					}
+				}
+			}
+			console.log(arr);
+		}
+		//2.快速排序
+		
+	</script>
+
+</html>

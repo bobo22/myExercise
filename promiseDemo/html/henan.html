@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>河南移动智慧城市门户用户登录</title>
+    <meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link href="css/mui.min.css" rel="stylesheet" />
+    <link href="css/loginmobile.css" rel="stylesheet" />
+    <style type="text/css">
+			#btn-changelogin {
+				text-align: center;
+			}
+			
+			.changelogin {
+				color: #007AFF;
+				border-bottom: 1px solid #007AFF;
+			}
+			
+			.hidden {
+				display: none;
+			}
+			
+			.icon-phone {
+				width: 16px;
+				height: 28px;
+				background: url(../../img/login/img_icon_email.png) 26px 10px no-repeat;
+				background-size: 20px 20px;
+			}
+			
+			.verticafy {
+				float: right;
+				font-size: 14px;
+				line-height: 30px;
+				margin-top: 7px;
+				margin-right: 10px;
+				border-left: 1px solid #007AFF;
+				color: #CCCCCC;
+				height: 30px;
+			}
+			
+			#phone {
+				width: 35%!important;
+				margin-left: 0px!important;
+			}
+			.mui-toast-container {
+    			bottom: 50% !important;/*离布局底部的距离*/
+    		}
+		</style>
+    <script src="../fui/js/cssboot.js"></script>
+    <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+</head>
+
+<body style="text-align: center">
+
+    <div class="yz-login-form">
+        <!-- logo -->
+        <i class="yz-login-logo"></i>
+        <!-- 输入框 -->
+        <div class="yz-login-input" id="userlog">
+            <div class="mui-input-row yz-first">
+                <label class="icon-user"></label>
+                <input type="text"
+                    placeholder="请输入手机号码" id="username" value="">
+            </div>
+            <div class="mui-input-row yz-first">
+                <label class="icon-psd"></label>
+                <input type="password"
+                    placeholder="请输入密码" id="password" value="">
+            </div>
+            <div class="mui-input-row">
+                <label class="icon-imgcode"></label>
+                <input type="text"
+                    placeholder="请输入图形验证码" id="imgcode" value="" style="width:140px">
+                <img id="pic" style="display:none;margin-top:12px;;">
+            </div>
+        </div>
+        
+        <div class="yz-login-input hidden" id="phonelog">
+					<div class="mui-input-row yz-first">
+						<label class="icon-user"></label>
+						<input type="text" placeholder="请输入手机号码" id="phone" value="">
+						<span class="verticafy">获取验证码</span>
+					</div>
+					<div class="mui-input-row">
+						<label class="icon-psd"></label>
+						<input type="password" placeholder="请输入验证码" id="vertify" value="">
+					</div>
+		</div>
+				
+				
+        <!-- 注册和忘记密码-->
+        <div class="yz-login-tips" style="display: block">
+            <span id="btn-register" onclick="register('','register',100)">快速注册</span>
+            <span id="btn-forgetPSD" class="yz-hidden" onclick="mgpassword('','mgpassword',100)">忘记密码</span>
+        </div>
+        <!-- 登录按钮 -->
+        <div class="yz-login-btn " id="btn-login">
+            <button class="mui-btn yz-btn" onclick="login()">登&nbsp;录</button>
+        </div>
+        <div class="yz-login-btn " id="btn-changelogin">
+			<span class="changelogin" id="phonechange">切换为短信登录</span>
+		</div>
+    </div>
+
+    <script src="../fui/js/jsboot.js"></script>
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <!-- <script src="js/jQuery.md5.js"></script> -->
+    <script src="js/DES3.js"></script>
+    <script src="js/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="js/mui.min.js"></script>
+    <!-- 配置变量 -->
+    <script>
+    	$(function(){
+    	    $('#pic').on('click', function() {
+    	    	refreshimg();
+    	    });
+    		refreshimg();
+    	});
+    
+    function refreshimg()
+    {
+
+        $.ajax({
+            url: '/henansso/rest/oauth2/svr/getvalidatecodeimage?isCommondto=true',
+            type: 'get',
+            success: function (data) {
+            	data = JSON.parse(data);
+            	$("#pic")[0].src = data.UserArea.src;
+            	$("#pic").css("display","block");
+            },
+            error: function(error) {
+            	mui.toast('系统暂停服务');
+            }
+        });
+    }
+    
+//注册函数
+		var register = function(data,eventName, delytime){
+			//plus下才执行
+			//mui.plusReady(function() {
+			//	//传给app的首页，success方法为目前商定的首页接收方法
+			//	var indexPage = plus.webview.getWebviewById(plus.runtime.appid);
+			//	if(indexPage) {
+			//		//通知首页
+			//		mui.fire(indexPage, eventName,data);
+			//		//以下代码自定义,为关闭当前页面的代码
+			//		setTimeout(function() {
+			//			mui.back();
+			//		}, delytime);
+			//	}
+			//});
+			
+			window.location='/file/project.dcloud.HNZHCS/html/login/ZHHN_register.html';
+		}
+		//忘记密码
+		var mgpassword = function(data,eventName, delytime){
+			//mui.plusReady(function() {
+			//	//传给app的首页，success方法为目前商定的首页接收方法
+			//	var indexPage = plus.webview.getWebviewById(plus.runtime.appid);
+			//	if(indexPage) {
+			//		//通知首页
+			//		mui.fire(indexPage, eventName,data);
+			//		//以下代码自定义,为关闭当前页面的代码
+			//		setTimeout(function() {
+			//			mui.back();
+			//		}, delytime);
+			//	}
+			//});
+			window.location='/file/project.dcloud.HNZHCS/html/login/ZHHN_mgpassword.html';
+		}
+		var getplacecode = function()
+		{
+			var placecode = '';
+			if(window.localStorage && window.localStorage.areacode)
+			{
+				placecode=window.localStorage.areacode;
+			}else
+			{
+				if(returnCitySN)
+					placecode=returnCitySN.cid;
+			}
+			return placecode;
+		}
+		var getip = function()
+		{
+			var ip = '';
+			if(returnCitySN)
+				ip = returnCitySN.cip;
+			return ip;
+		}
+		$('#btn-changelogin').on('tap','#phonechange',function(e){
+			//alert('1');
+			if($(this).text() == '切换为短信登录'){
+				$('#phonelog').removeClass('hidden');
+				$('#userlog').addClass('hidden');
+				$(this).text('切换为密码登录');
+			}else{
+				$('#userlog').removeClass('hidden');
+				$('#phonelog').addClass('hidden');
+				$(this).text('切换为短信登录'); 
+			}
+		});
+		
+		$('.verticafy').on('tap',function(){
+			
+			var gather = {
+		            "phone": $('#phone').val(),
+		            "type":"login",
+		            "placecode":getplacecode()
+		        };
+		    	$.ajax({
+		            url: "/henanfront/rest/oauth2/pcsvr/getverifycode",
+		            type: 'post',
+		            data: gather,
+		            success: function (data) {
+		                var dataJson = eval('(' + data + ')');
+		                if(dataJson.UserArea.code == 1)
+		            	{
+		                	mui.toast('短信已发送到您的手机，请查收');
+		            	}else
+		        		{
+		            		mui.toast(dataJson.UserArea.msg);
+		        		}
+		            },
+		            error: function(error) {
+		                mui.toast('请重试');
+		            }
+		        });
+		})
+		
+		
+
+
+        function login() {       	
+        	
+        	// 第三个参数用来标记登录方式 默认为：0，短信登录使用：fast
+        	if($('#phonechange').text() == '切换为短信登录'){
+        		var username = $("#username").val();
+            	//var password = $.md5($("#password").val());
+            	var password = DES3.encrypt($("#password").val());
+        		var imgcode = $("#imgcode").val();
+        		epoint.execute('loginaction.login', '', [ username, password, "0" ,imgcode,getplacecode(),getip(),"app"],callback);
+        	}else{
+        		var username = $("#phone").val();
+            	var password = $("#vertify").val();
+        		epoint.execute('loginaction.login', '', [ username, password, "fast","", getplacecode(),getip(),"app"],callback);
+        	}
+        	$.blockUI({ css: { 
+                border: 'none', 
+                padding: '15px', 
+                backgroundColor: '#000', 
+                '-webkit-border-radius': '10px', 
+                '-moz-border-radius': '10px', 
+                opacity: .5, 
+                color: '#fff'
+            } }); 
+        }
+        function callback(data){
+        	//var dataJson = eval('(' + data + ')');
+            // 返回的data格式：{'url':'登录成功后的跳转地址','error':'登录失败信息'}
+            if (data.url) {
+            	$.blockUI({message:'跳转中，请稍后', css: { 
+                    border: 'none', 
+                    padding: '15px', 
+                    backgroundColor: '#000', 
+                    '-webkit-border-radius': '10px', 
+                    '-moz-border-radius': '10px', 
+                    opacity: .5, 
+                    color: '#fff'
+                } }); 
+                window.location.href = data.url;
+            } else if(data.systemMessages) {
+            	$.unblockUI();
+            	mui.toast(data.systemMessages);
+            }
+        }
+        
+        var currentlogintype="pwd";
+        function changelogintype()
+        {
+        	if(currentlogintype=="pwd"){
+        		currentlogintype="phonecode";
+        		$("#btnLoginType").html("密码登录");
+        		alert(currentlogintype);
+        	}
+        	else
+       		{
+        		currentlogintype="pwd";
+       		}
+        }
+    </script>
+</body>
+
+</html>

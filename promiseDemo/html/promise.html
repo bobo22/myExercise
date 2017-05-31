@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>promise测试</title>
+	</head>
+	<script src="../js/jquery-1.11.0.min.js"></script>
+
+	<body>
+
+	</body>
+	<script type="text/javascript">
+		var date = {
+			"ValidateData": "Epoint_WebSerivce_**##0601",
+			"paras": {
+				"RowGuid": "c87191c6-e405-4c56-b458-aea27b98af75"
+			}
+		};
+		allurl = 'http://58.210.182.199:8081/CSSCOAService/OAWebService/GetJBTSDetail';
+		/*$.ajax({
+			type: 'POST',
+			url: 'http://58.210.182.199:8081/CSSCOAService/OAWebService/GetBMChooseListData',
+			data: date,
+			dataType: 'json',
+			success: function(response) {
+				console.log(response);
+			},
+			error: function(error) {
+				console.log(error);
+			}
+		});*/
+		/*mui.ajax(allurl, {
+			data: date,
+			dataType: "json",
+			type: "POST",
+			success: function(response) {
+				console.log(response);
+			},
+			error: function(response) {
+				console.log(response);
+			}
+		});*/
+		//封装一个promise实现ajax操作
+		var promise = new Promise(function(resolve, reject) {
+				$.ajax({
+					//请求方式为get
+					type: "GET",
+					//json文件位置
+					url: "test.json",
+					//返回数据格式为json
+					dataType: "json",
+					//请求成功完成后要执行的方法
+					success: function(data) {
+						resolve(data);
+					},
+					error: function(response) {
+						reject(data);
+					}
+				});
+			})
+			//调用该promise
+			/*promise.then(function(response){
+				//resolve函数，表示成功回调
+				console.log(JSON.stringify(response))
+			},function(error){
+				//reject函数，表示失败回调
+				console.log(error);
+			})*/
+
+		//promise的then方法链式调用
+		promise.then(function(response) {
+			return response;
+		}).then(function(post) {
+			console.log(JSON.stringify(post));
+		}).catch(function(err) {
+			console.log(err);
+		});
+
+		//下面我们改进一下，做一个传参类型的函数
+		var getJSON = function(urlload) {
+			var promise = new Promise(function(resolve, reject) {
+				$.ajax({
+					//请求方式为get
+					type: "GET",
+					//json文件位置
+					url: urlload,
+					//返回数据格式为json
+					dataType: "json",
+					//请求成功完成后要执行的方法
+					success: function(data) {
+						resolve(data);
+					},
+					error: function(response) {
+						reject(data);
+					}
+				});
+			});
+			return promise;
+		}
+		
+		//promise的then方法链式调用
+		getJSON('test.json').then(function(response) {
+			console.log(JSON.stringify(response));
+			return getJSON('test2.json');//下面一个then回调调用的是这个promise
+		}).then(function(response) {
+			console.log(JSON.stringify(response));
+			return response;//下面回调里的post就是这个json
+		}).then(function(post){
+			console.log(post);
+		}).catch(function(err){
+			console.log(err);
+		});
+		
+		//首先我们根据获取的东西不一样建立两个promise对象，分别用来获取token和其他用户信息
+		var promiseToken = new Promise(function(resolve,reject){
+			ejs.oauth.getToken(function(result, msg, detail){
+				resolve(result.token);
+			}
+		});
+		
+		var promiseUser = function(usekey){
+			var promiseUserInfo = new Promise(function(resolve,reject){
+				ejs.sql.getConfigValue( usekey , function(result, msg, res) {
+					resolve(result.value);
+				}
+			});
+			return promiseUserInfo;
+		}
+		
+		//下面我们就要调用这两个promise对象，获取用户信息以及token,这里面可以一直then下去获取相关信息
+		promiseToken.then(function(response){
+			console.log(response);
+			return promiseUser('MOA_KEY_UserGuid');
+		}).then(function(response){
+			console.log(response);
+			return promiseUser('MOA_KEY_DisplayName');
+		}).catch(function(err){
+			console.log(err);
+		})
+	</script>
+
+</html>
