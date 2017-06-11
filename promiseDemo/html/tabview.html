@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		.tabchange div {
+			float: left;
+			width: 33.3%;
+			height: 38px;
+			line-height: 38px;
+			text-align: center;
+		}
+		
+		.active {
+			color: #067aea;
+			border-bottom: 1px solid #067aea;
+		}
+		
+		.hidden {
+			display: none;
+		}
+	</style>
+
+	<body>
+		<div class="wrap">
+			<!--
+            	描述： 头部tab切换
+            -->
+			<section class="tabchange mui-clearfix">
+				<div class="project active" data-name="project">
+					项目信息
+				</div>
+				<div class="file" data-name="file">
+					相关附件
+				</div>
+				<div class="proxy" data-name="proxy">
+					招标代理
+				</div>
+			</section>
+			<section class="panel">
+				内容1
+			</section>
+			<section class="panel hidden">
+				内容2
+			</section>
+			<section class="panel hidden">
+				内容3
+			</section>
+		</div>
+
+	</body>
+	<script>
+		function Tab(ct) { //写一个构造函数；
+			this.ct = ct;
+			this.init(); //init()初始化
+			this.bind(); //bind()//绑定事件处理；
+		}
+		Tab.prototype.init = function() { //给原型上帮定初始化函数；
+			this.tabLis = document.querySelectorAll('.tabchange>div'); //选中所有的div
+			this.panels = document.querySelectorAll('.panel'); //选中所有的panel
+		}
+		Tab.prototype.bind = function() {
+			var _this = this; //保存this指向 
+			this.tabLis.forEach(function(tabli) { //循环所有的的li，
+				tabli.onclick = function(e) { //当点击时
+					var target = e.target; //被点中的的目标li;
+					var index = [].indexOf.call(_this.tabLis, target) //借用数组方法；获取被点中的li下标；
+					_this.tabLis.forEach(function(li) { //循环所有的的li，
+						li.classList.remove('active'); //循环所有的的li，去掉active
+					})
+
+					target.classList.add('active'); //给点中的li加上 active
+					_this.panels.forEach(function(panel) { //循环所有的的panel，
+						panel.classList.add('hidden') //循环所有的的panel，去掉active
+					})
+					_this.panels[index].classList.remove('hidden') //给对应li小标的panel加上active
+
+				}
+			})
+		}
+		new Tab(document.querySelectorAll('.wrap'));
+	</script>
+
+</html>
