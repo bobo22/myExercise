@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			ul,
+			ol {
+				list-style: none;
+			}
+			/*消除图片底部3像素距离*/
+			
+			img {
+				vertical-align: top;
+			}
+			
+			.scroll {
+				width: 500px;
+				height: 200px;
+				margin: 100px auto;
+				border: 1px solid #ccc;
+				padding: 7px;
+				overflow: hidden;
+				position: relative;
+			}
+			
+			.box {
+				width: 500px;
+				height: 200px;
+				overflow: hidden;
+				position: relative;
+			}
+			
+			.box ul {
+				width: 600%;
+				position: absolute;
+				left: 0;
+				top: 0;
+			}
+			
+			.box ul li {
+				float: left;
+			}
+			
+			.box ol {
+				position: absolute;
+				right: 50%;
+				margin-right: -100px;
+				bottom: 10px;
+			}
+			
+			.box ol li {
+				float: left;
+				width: 30px;
+				height: 5px;
+				background: #FFFFFF;
+				text-align: center;
+				margin-left: 10px;
+				cursor: pointer;
+			}
+			
+			.box ol li.current {
+				background-color: purple;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="box" class="box">
+			<ul id="ul">
+				<li><img src="../img/1.jpg" width="500" height="200"></li>
+				<li><img src="../img/2.jpg" width="500" height="200"></li>
+				<li><img src="../img/3.jpg" width="500" height="200"></li>
+				<li><img src="../img/4.jpg" width="500" height="200"></li>
+				<li><img src="../img/5.jpg" width="500" height="200"></li>
+			</ul>
+		</div>
+	</body>
+
+	<script>
+		//首先我们生成小圆点
+		var doc = document;
+		var box = doc.getElementById('box'), //获取大盒子
+			ul = doc.getElementById('ul'), //获取图片ul
+			ulList = ul.children, //获取图片的子元素
+			ulListWidth = ulList[0].offsetWidth; //获取每个li的标签
+		//实现无缝滚动，需要将第一张图片放到最后面一个
+		ul.appendChild(ulList[0].cloneNode(true));
+
+		//动态添加小圆点
+		var ol = doc.createElement('ol');
+		box.appendChild(ol);
+		for(var i = 0; i < ulList.length - 1; i++) {
+			var li = document.createElement("li"); // 创建li元素
+			//li.innerHTML = i + 1; // 给li里面添加文字  1 2 3 4 5
+			ol.appendChild(li); // 将li元素添加到ol里面
+		}
+		ol.children[0].className = "current"; // ol中的第一个li背景色为purple
+
+		var olLis = ol.children;
+		//我们在这边主要实现两个功能，1.图片自己滚动 2.鼠标经过第几个小圆点，就显示第几张图片
+		//封装一个函数用来实现动画效果
+		//第一个参数代表动的元素，第二个代表动多少
+		function animate(obj, target) {
+			clearInterval(obj.timer);
+			//判断是向左移还是向右移
+			var speed = obj.offsetLeft < target ? 15 : -15;
+
+			obj.timer = setInterval(function() {
+				var result = target - obj.offsetLeft;
+				obj.style.left = obj.offsetLeft + speed + 'px';
+				//可能有小数的存在，这边需要做一个判断
+				if(Math.abs(result) <= Math.abs(speed)) {
+					clearInterval(obj.timer);
+					obj.style.left = target + 'px';
+				}
+			}, 10)
+		}
+
+		var timer = null; // 轮播图的定时器
+		var key = 0; // 控制播放的张数
+		var circle = 0; // 控制小圆点
+
+		timer = setInterval(autoplay, 2000); // 自动轮播
+		function autoplay() {
+			/*自动轮播时,要对播放的张数key进行一个判断,如果播放的张数超过ulLis.length-1,
+			就要重头开始播放.  因为我们克隆了第一张并将其放在最后面,所以我们要从第二张图片开始播放*/
+			key++; // 先++
+			if(key > ulList.length - 1) { // 后判断
+				ul.style.left = 0; // 迅速调回,这时候是看不出效果的，因为这个效果和展示最后一张效果重叠
+				key = 1; // 因为第6张是第一张，所以播放的时候是从第2张开始播放
+			}
+			// 动画部分
+			animate(ul, -key * ulListWidth);
+			// 小圆点circle   当显示第几张图片是，对应的小圆点的颜色也发生变化 
+
+			/*同理,对小圆点也要有一个判断*/
+			circle++;
+			if(circle > olLis.length - 1) {
+				circle = 0;
+			}
+			// 小圆点颜色发生变化
+			for(var i = 0; i < olLis.length; i++) {
+				// 先清除掉所用的小圆点类名
+				olLis[i].className = "";
+			}
+			// 给当前的小圆点 添加一个类名
+			olLis[circle].className = "current";
+		}
+		//存在一些问题
+		ol.addEventListener('click', function(e) {
+			if(e.target.nodeName.toLowerCase() == 'li') {
+				clearInterval(timer);
+				// 小圆点颜色发生变化
+				for(var i = 0; i < olLis.length; i++) {
+					// 先清除掉所用的小圆点类名
+					olLis[i].className = "";
+				}
+				// 给当前的小圆点 添加一个类名
+				e.target.className = "current";
+				
+				for(var i = 0; i < olLis.length; i++) {
+					if(olLis[i].className == "current"){
+						key = i - 1;
+						circle = i;
+						timer = setInterval(autoplay, 2000);
+					}				
+				}
+			}
+		})
+	</script>
+
+</html>
